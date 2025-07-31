@@ -33,6 +33,7 @@ import {
   readBooleanFromMetadata,
   readNumberFromMetadata,
 } from "../sceneMetadataHelpers";
+import { getImageCenter } from "./mathHelpers";
 
 let itemsLast: Image[] = []; // for item change checks
 const addItemsArray: Item[] = []; // for bulk addition or changing of items
@@ -257,21 +258,17 @@ function getChangedItems(items: Image[]): Image[] {
     } else if (
       //check position, visibility, and metadata changes
       !(
-        // itemsLast[i + s].position.x === items[i].position.x &&
-        // itemsLast[i + s].position.y === items[i].position.y &&
-        (
-          itemsLast[i + s].visible === items[i].visible &&
-          JSON.stringify(
-            itemsLast[i + s].metadata[getPluginId(TRACKER_METADATA_ID)],
-          ) ===
-            JSON.stringify(
-              items[i].metadata[getPluginId(TRACKER_METADATA_ID)],
-            ) &&
-          JSON.stringify(
-            itemsLast[i + s].metadata[getPluginId(HIDDEN_METADATA_ID)],
-          ) ===
-            JSON.stringify(items[i].metadata[getPluginId(HIDDEN_METADATA_ID)])
-        )
+        itemsLast[i + s].grid.offset.x === items[i].grid.offset.x &&
+        itemsLast[i + s].grid.offset.y === items[i].grid.offset.y &&
+        itemsLast[i + s].grid.dpi === items[i].grid.dpi &&
+        itemsLast[i + s].visible === items[i].visible &&
+        JSON.stringify(
+          itemsLast[i + s].metadata[getPluginId(TRACKER_METADATA_ID)],
+        ) ===
+          JSON.stringify(items[i].metadata[getPluginId(TRACKER_METADATA_ID)]) &&
+        JSON.stringify(
+          itemsLast[i + s].metadata[getPluginId(HIDDEN_METADATA_ID)],
+        ) === JSON.stringify(items[i].metadata[getPluginId(HIDDEN_METADATA_ID)])
       )
     ) {
       //update items
@@ -314,10 +311,7 @@ function updateItemTrackers(
     bounds.height = Math.abs(bounds.height);
 
     // Determine coordinate origin for drawing stats
-    const origin = {
-      x: item.position.x,
-      y: item.position.y - (trackersAboveToken ? bounds.height : 0),
-    };
+    const origin = getImageCenter(item, sceneDpi);
 
     const barHeight = MINIMAL_BAR_HEIGHT;
 
@@ -377,10 +371,7 @@ function updateItemTrackers(
     bounds.height = Math.abs(bounds.height);
 
     // Determine coordinate origin for drawing stats
-    const origin = {
-      x: item.position.x,
-      y: item.position.y - (trackersAboveToken ? bounds.height : 0),
-    };
+    const origin = getImageCenter(item, sceneDpi);
 
     const barHeight = barHeightIsReduced ? REDUCED_BAR_HEIGHT : FULL_BAR_HEIGHT;
 
