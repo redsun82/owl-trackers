@@ -312,6 +312,7 @@ function updateItemTrackers(
 
     // Determine coordinate origin for drawing stats
     const origin = getImageCenter(item, sceneDpi);
+    if (trackersAboveToken) origin.y -= bounds.height;
 
     const barHeight = MINIMAL_BAR_HEIGHT;
 
@@ -372,6 +373,7 @@ function updateItemTrackers(
 
     // Determine coordinate origin for drawing stats
     const origin = getImageCenter(item, sceneDpi);
+    if (trackersAboveToken) origin.y -= bounds.height;
 
     const barHeight = barHeightIsReduced ? REDUCED_BAR_HEIGHT : FULL_BAR_HEIGHT;
 
