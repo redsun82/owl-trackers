@@ -35,6 +35,9 @@ export class BubblePosition {
       this.currentRowMaxHeight = scaledDiameter;
     }
 
+    // Above token: grow downward (+1), Below token: grow upward (-1)
+    const yDirection = this.aboveToken ? 1 : -1;
+
     const position = {
       x:
         this.origin.x +
@@ -43,12 +46,10 @@ export class BubblePosition {
         this.currentRowXOffset +
         scaledDiameter / 2,
       y:
-        this.origin.y -
-        (this.aboveToken
-          ? -spacing - scaledDiameter / 2 + this.cumulativeYOffset
-          : spacing + scaledDiameter / 2 + this.cumulativeYOffset) -
+        this.origin.y +
+        this.bounds.height / 2 -
         (this.aboveToken ? 0 : this.totalBarHeight) +
-        this.bounds.height / 2,
+        yDirection * (spacing + scaledDiameter / 2 + this.cumulativeYOffset)
     };
 
     this.currentRowXOffset += scaledDiameter + spacing;
