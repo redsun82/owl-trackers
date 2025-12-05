@@ -382,11 +382,15 @@ function updateItemTrackers(
       (tracker) => tracker.variant === "value-max",
     );
 
+    let cumulativeBarHeight = 0;
     barTrackers.forEach((tracker, index) => {
       if (tracker.showOnMap === false) {
         // console.log("hidden", barIndex);
         deleteItemsArray.push(...getBarItemIds(item.id, index));
       } else {
+        const sizeScale = (tracker.sizePercentage ?? 100) / 100;
+        const scaledBarHeight = barHeight * sizeScale;
+
         addItemsArray.push(
           ...createTrackerBar(
             item,
@@ -396,7 +400,7 @@ function updateItemTrackers(
               x: origin.x,
               y:
                 origin.y -
-                index * barHeight +
+                cumulativeBarHeight +
                 bounds.height / 2 -
                 verticalOffset,
             },
@@ -404,6 +408,8 @@ function updateItemTrackers(
             barHeightIsReduced,
           ),
         );
+
+        cumulativeBarHeight += scaledBarHeight;
       }
     });
 
@@ -415,8 +421,7 @@ function updateItemTrackers(
     const bubblePosition = new BubblePosition(
       origin,
       bounds,
-      barTrackers.length,
-      barHeight,
+      cumulativeBarHeight,
       trackersAboveToken,
     );
 
@@ -450,7 +455,8 @@ function updateItemTrackers(
       if (tracker.showOnMap === false) {
         deleteItemsArray.push(...getBubbleItemIds(item.id, index));
       } else {
-        const position = bubblePosition.getNew();
+        const sizeScale = (tracker.sizePercentage ?? 100) / 100;
+        const position = bubblePosition.getNew(sizeScale);
         addItemsArray.push(
           ...createTrackerBubble(
             item,

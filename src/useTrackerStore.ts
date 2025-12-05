@@ -20,7 +20,7 @@ interface TrackerState {
   overWriteTrackers: (trackers: Tracker[]) => void;
   updateTrackerField: (
     trackerId: string,
-    field: "value" | "max" | "name" | "color" | "checked",
+    field: "value" | "max" | "name" | "color" | "checked" | "sizePercentage",
     content: string | number | boolean,
   ) => void;
   addTrackerBubble: () => void;

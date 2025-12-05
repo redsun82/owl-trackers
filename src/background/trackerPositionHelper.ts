@@ -3,49 +3,55 @@ import { BUBBLE_DIAMETER } from "./compoundItemHelpers";
 export class BubblePosition {
   origin: { x: number; y: number };
   bounds: { width: number; height: number };
-  barCount: number;
-  barHeight: number;
+  totalBarHeight: number;
   aboveToken: boolean;
-  rowIndex = 0;
-  columnIndex = 0;
+  currentRowXOffset = 0;
+  currentRowMaxHeight = 0;
+  cumulativeYOffset = 0;
 
   constructor(
     origin: { x: number; y: number },
     bounds: { width: number; height: number },
-    barCount: number,
-    barHeight: number,
+    totalBarHeight: number,
     aboveToken: boolean = false,
   ) {
     this.origin = origin;
     this.bounds = bounds;
-    this.barCount = barCount;
-    this.barHeight = barHeight;
+    this.totalBarHeight = totalBarHeight;
     this.aboveToken = aboveToken;
   }
 
-  getNew(): { x: number; y: number } {
-    if ((this.rowIndex + 1) * (BUBBLE_DIAMETER + 2) > this.bounds.width) {
-      if (this.aboveToken) this.columnIndex--;
-      else this.columnIndex++;
-      this.rowIndex = 0;
+  getNew(sizeScale: number = 1): { x: number; y: number } {
+    const scaledDiameter = BUBBLE_DIAMETER * sizeScale;
+    const spacing = 2;
+
+    if (this.currentRowXOffset + scaledDiameter + spacing > this.bounds.width) {
+      this.cumulativeYOffset += this.currentRowMaxHeight + spacing;
+      this.currentRowXOffset = 0;
+      this.currentRowMaxHeight = 0;
+    }
+
+    if (scaledDiameter > this.currentRowMaxHeight) {
+      this.currentRowMaxHeight = scaledDiameter;
     }
 
     const position = {
       x:
         this.origin.x +
-        2 -
+        spacing -
         this.bounds.width / 2 +
-        this.rowIndex * (BUBBLE_DIAMETER + 2) +
-        BUBBLE_DIAMETER / 2,
+        this.currentRowXOffset +
+        scaledDiameter / 2,
       y:
         this.origin.y -
-        (this.aboveToken ? -2 - BUBBLE_DIAMETER / 2 : 2 + BUBBLE_DIAMETER / 2) -
-        this.columnIndex * (BUBBLE_DIAMETER + 2) -
-        (this.aboveToken ? 0 : this.barCount * this.barHeight) +
+        (this.aboveToken
+          ? -spacing - scaledDiameter / 2 + this.cumulativeYOffset
+          : spacing + scaledDiameter / 2 + this.cumulativeYOffset) -
+        (this.aboveToken ? 0 : this.totalBarHeight) +
         this.bounds.height / 2,
     };
 
-    this.rowIndex++;
+    this.currentRowXOffset += scaledDiameter + spacing;
     return position;
   }
 }

@@ -4,6 +4,7 @@ import ColorPicker from "../components/ColorPicker";
 import NameInput from "../components/NameInput";
 import PartiallyControlledInput from "../components/PartiallyControlledInput";
 import { TrackerInput } from "../components/TrackerInput";
+import SizeInput from "../components/SizeInput";
 import CheckedCircle from "../icons/CheckedCircle";
 import MathIcon from "../icons/MathIcon";
 import NoMathIcon from "../icons/NoMathIcon";
@@ -129,6 +130,12 @@ export default function TrackerCard({
                 />
               </Tooltip>
             </div>
+            <SizeInput
+              sizePercentage={tracker.sizePercentage ?? 100}
+              onSizeChange={(newSize) =>
+                updateTrackerField(tracker.id, "sizePercentage", newSize)
+              }
+            />
             <Button
               fullWidth
               variant="outlined"

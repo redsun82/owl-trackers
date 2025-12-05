@@ -8,6 +8,7 @@ export type Tracker = {
   name?: string;
   showOnMap?: boolean;
   inlineMath?: boolean;
+  sizePercentage?: number;
 } & (
   | {
       variant: "value";
@@ -51,6 +52,9 @@ export function isTracker(
     tracker.inlineMath !== undefined &&
     typeof tracker.inlineMath !== "boolean"
   )
+    return false;
+
+  if (tracker.sizePercentage !== undefined && typeof tracker.sizePercentage !== "number")
     return false;
 
   if (tracker.variant === "value") {
