@@ -1,7 +1,6 @@
 import OBR, { Image, Item, Metadata, isImage } from "@owlbear-rodeo/sdk";
 import { getPluginId } from "../getPluginId";
 import {
-  FULL_BAR_HEIGHT,
   createTrackerBubble,
   createTrackerBar,
   getBarItemIds,
@@ -9,7 +8,6 @@ import {
   getBubbleItemIds,
   createImageBubble,
   getImageBubbleItemIds,
-  REDUCED_BAR_HEIGHT,
   MINIMAL_BAR_HEIGHT,
   createMinimalTrackerBar,
   getImageId,
@@ -26,7 +24,7 @@ import {
 } from "../trackerHelpersBasic";
 import { BubblePosition } from "./trackerPositionHelper";
 import {
-  BAR_HEIGHT_METADATA_ID,
+  BASE_BAR_HEIGHT_METADATA_ID,
   SEGMENTS_ENABLED_METADATA_ID,
   TRACKERS_ABOVE_METADATA_ID,
   VERTICAL_OFFSET_METADATA_ID,
@@ -34,7 +32,9 @@ import {
   readNumberFromMetadata,
 } from "../sceneMetadataHelpers";
 import { getImageCenter } from "./mathHelpers";
+import { DEFAULT_BAR_HEIGHT } from "../useSceneSettingsStore";
 
+// Module state - allows changes to scene metadata to affect all tokens simultaneously
 let itemsLast: Image[] = []; // for item change checks
 const addItemsArray: Item[] = []; // for bulk addition or changing of items
 const deleteItemsArray: string[] = []; // for bulk deletion of scene items
@@ -43,7 +43,7 @@ let userRoleLast: "GM" | "PLAYER";
 
 let verticalOffset = 0;
 let trackersAboveToken = false;
-let barHeightIsReduced = false;
+let baseBarHeight = DEFAULT_BAR_HEIGHT;
 let segmentsEnabled = true;
 let segmentSettings = new Map<string, number>();
 
@@ -78,24 +78,24 @@ async function getGlobalSettings(sceneMetadata?: Metadata): Promise<boolean> {
   const [
     newVerticalOffset,
     newTrackersAboveToken,
-    newBarHeightIsReduced,
+    newBaseBarHeight,
     newSegmentsEnabled,
   ] = [
     readNumberFromMetadata(sceneMetadata, VERTICAL_OFFSET_METADATA_ID),
     readBooleanFromMetadata(sceneMetadata, TRACKERS_ABOVE_METADATA_ID),
-    readBooleanFromMetadata(sceneMetadata, BAR_HEIGHT_METADATA_ID),
+    readNumberFromMetadata(sceneMetadata, BASE_BAR_HEIGHT_METADATA_ID) || DEFAULT_BAR_HEIGHT,
     readBooleanFromMetadata(sceneMetadata, SEGMENTS_ENABLED_METADATA_ID),
   ];
 
   const doRefresh =
     newVerticalOffset !== verticalOffset ||
     newTrackersAboveToken !== trackersAboveToken ||
-    newBarHeightIsReduced !== barHeightIsReduced ||
+    newBaseBarHeight !== baseBarHeight ||
     newSegmentsEnabled !== segmentsEnabled;
 
   verticalOffset = newVerticalOffset;
   trackersAboveToken = newTrackersAboveToken;
-  barHeightIsReduced = newBarHeightIsReduced;
+  baseBarHeight = newBaseBarHeight;
   segmentsEnabled = newSegmentsEnabled;
 
   return doRefresh;
@@ -375,8 +375,6 @@ function updateItemTrackers(
     const origin = getImageCenter(item, sceneDpi);
     if (trackersAboveToken) origin.y -= bounds.height;
 
-    const barHeight = barHeightIsReduced ? REDUCED_BAR_HEIGHT : FULL_BAR_HEIGHT;
-
     // Add bar trackers
     const barTrackers = trackers.filter(
       (tracker) => tracker.variant === "value-max",
@@ -389,7 +387,7 @@ function updateItemTrackers(
         deleteItemsArray.push(...getBarItemIds(item.id, index));
       } else {
         const sizeScale = (tracker.sizePercentage ?? 100) / 100;
-        const scaledBarHeight = barHeight * sizeScale;
+        const scaledBarHeight = baseBarHeight * sizeScale;
 
         addItemsArray.push(
           ...createTrackerBar(
@@ -405,7 +403,7 @@ function updateItemTrackers(
                 verticalOffset,
             },
             index,
-            barHeightIsReduced,
+            baseBarHeight,
           ),
         );
 

@@ -178,12 +178,12 @@ export function createTrackerBar(
   tracker: Tracker,
   origin: { x: number; y: number },
   index: number,
-  reducedHeight = false,
+  baseBarHeight: number,
   segments = 0,
 ): Item[] {
   const sizeScale = (tracker.sizePercentage ?? 100) / 100;
-  const barHeight = (reducedHeight ? REDUCED_BAR_HEIGHT : FULL_BAR_HEIGHT) * sizeScale;
-  const scaledCornerRadius = (BAR_CORNER_RADIUS * sizeScale);
+  const barHeight = baseBarHeight * sizeScale;
+  const scaledCornerRadius = ((baseBarHeight / 2) * sizeScale);
   const position = {
     x: origin.x - bounds.width / 2 + BAR_PADDING,
     y: origin.y - barHeight,
@@ -239,17 +239,13 @@ export function createTrackerBar(
     )
     .build();
 
-  const barTextHeight = (reducedHeight
-    ? REDUCED_BAR_HEIGHT + 8
-    : FULL_BAR_HEIGHT + 8) * sizeScale;
-  const barFontSize = (reducedHeight
-    ? REDUCED_BAR_HEIGHT + 2
-    : FULL_BAR_HEIGHT + 2) * sizeScale;
+  const barTextHeight = (baseBarHeight + 8) * sizeScale;
+  const barFontSize = (baseBarHeight + 2) * sizeScale;
 
   const barText = buildText()
     .position({
       x: position.x,
-      y: position.y + TEXT_VERTICAL_OFFSET + (-5.3 - (reducedHeight ? -0.8 : 0)) * sizeScale,
+      y: position.y + TEXT_VERTICAL_OFFSET + -5.3 * sizeScale,
     })
     .plainText(`${tracker.value}/${tracker.max}`)
     .textAlign("CENTER")

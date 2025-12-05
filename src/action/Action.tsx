@@ -6,7 +6,7 @@ import ToggleButton from "../components/ToggleButton";
 import { useEffect, useRef, useState } from "react";
 import Input from "../components/Input";
 import {
-  BAR_HEIGHT_METADATA_ID,
+  BASE_BAR_HEIGHT_METADATA_ID,
   SEGMENTS_ENABLED_METADATA_ID,
   TRACKERS_ABOVE_METADATA_ID,
   VERTICAL_OFFSET_METADATA_ID,
@@ -39,11 +39,9 @@ export function Action(): React.JSX.Element {
     (state) => state.setTrackersAboveToken,
   );
 
-  const barHeightIsReduced = useSceneSettingsStore(
-    (state) => state.barHeightIsReduced,
-  );
-  const setBarHeightIsReduced = useSceneSettingsStore(
-    (state) => state.setBarHeightIsReduced,
+  const baseBarHeight = useSceneSettingsStore((state) => state.baseBarHeight);
+  const setBaseBarHeight = useSceneSettingsStore(
+    (state) => state.setBaseBarHeight,
   );
 
   const segmentsEnabled = useSceneSettingsStore(
@@ -174,19 +172,19 @@ export function Action(): React.JSX.Element {
                   }}
                 ></ToggleButton>
 
-                {/* Default trackers */}
+                {/* Bar Height */}
                 <h2 className="justify-self-start text-sm text-text-primary dark:text-text-primary-dark">
-                  Use reduced bar height
+                  Bar Height
                 </h2>
-                <ToggleButton
-                  isChecked={barHeightIsReduced}
-                  changeHandler={(isChecked: boolean) => {
-                    setBarHeightIsReduced(isChecked);
+                <Input
+                  value={baseBarHeight}
+                  updateHandler={(value: number) => {
+                    setBaseBarHeight(value);
                     OBR.scene.setMetadata({
-                      [getPluginId(BAR_HEIGHT_METADATA_ID)]: isChecked,
+                      [getPluginId(BASE_BAR_HEIGHT_METADATA_ID)]: value,
                     });
                   }}
-                ></ToggleButton>
+                ></Input>
 
                 {/* Segments */}
                 <h2 className="justify-self-start text-sm text-text-primary dark:text-text-primary-dark">

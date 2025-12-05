@@ -3,7 +3,7 @@ import { getPluginId } from "./getPluginId";
 
 export const VERTICAL_OFFSET_METADATA_ID = "verticalOffset";
 export const TRACKERS_ABOVE_METADATA_ID = "trackersAboveToken";
-export const BAR_HEIGHT_METADATA_ID = "barHeightIsReduced";
+export const BASE_BAR_HEIGHT_METADATA_ID = "baseBarHeight";
 export const SEGMENTS_ENABLED_METADATA_ID = "segmentsEnabled";
 
 export function readBooleanFromMetadata(
