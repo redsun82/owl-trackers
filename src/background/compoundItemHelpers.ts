@@ -10,6 +10,14 @@ import {
 import { getColor } from "../colorHelpers";
 import { Tracker } from "../trackerHelpersBasic";
 import { createRoundedRectangle, getFillPortion } from "./mathHelpers";
+import {
+  BUBBLE_FONT_SIZE_RATIO,
+  BUBBLE_REDUCED_FONT_SIZE_RATIO,
+  BUBBLE_TEXT_HEIGHT_RATIO,
+  BAR_TEXT_HEIGHT_OFFSET_RATIO,
+  BAR_FONT_SIZE_OFFSET_RATIO,
+  BAR_TEXT_Y_OFFSET_RATIO,
+} from "../useSceneSettingsStore";
 
 // Constants used in multiple functions
 const FONT = "Roboto, sans-serif";
@@ -23,18 +31,13 @@ const DISABLE_ATTACHMENT_BEHAVIORS: AttachmentBehavior[] = [
 ];
 const TEXT_VERTICAL_OFFSET = -1.2;
 
-// Constants used in createStatBubble()
-export const BUBBLE_DIAMETER = 30;
-const CIRCLE_FONT_SIZE = BUBBLE_DIAMETER - 8;
-const REDUCED_CIRCLE_FONT_SIZE = BUBBLE_DIAMETER - 15;
-const CIRCLE_TEXT_HEIGHT = BUBBLE_DIAMETER + 2;
-
 /** Creates Stat Bubble component items */
 export function createTrackerBubble(
   item: Item,
   tracker: Tracker,
   position: { x: number; y: number },
   index: number,
+  baseBubbleDiameter: number,
 ): Item[] {
   if (
     tracker.variant !== "value" &&
@@ -44,10 +47,10 @@ export function createTrackerBubble(
     throw new Error("Expected value or counter tracker variant");
 
   const sizeScale = (tracker.sizePercentage ?? 100) / 100;
-  const scaledDiameter = BUBBLE_DIAMETER * sizeScale;
-  const scaledFontSize = (CIRCLE_FONT_SIZE * sizeScale);
-  const scaledReducedFontSize = (REDUCED_CIRCLE_FONT_SIZE * sizeScale);
-  const scaledTextHeight = (CIRCLE_TEXT_HEIGHT * sizeScale);
+  const scaledDiameter = baseBubbleDiameter * sizeScale;
+  const scaledFontSize = BUBBLE_FONT_SIZE_RATIO * scaledDiameter;
+  const scaledReducedFontSize = BUBBLE_REDUCED_FONT_SIZE_RATIO * scaledDiameter;
+  const scaledTextHeight = BUBBLE_TEXT_HEIGHT_RATIO * scaledDiameter;
 
   const bubbleShape = buildShape()
     .width(scaledDiameter)
@@ -116,10 +119,11 @@ export function createImageBubble(
   url: string,
   imageLabel: string,
   backgroundLabel: string,
+  baseBubbleDiameter: number,
 ): Item[] {
   const bubbleShape = buildShape()
-    .width(BUBBLE_DIAMETER)
-    .height(BUBBLE_DIAMETER)
+    .width(baseBubbleDiameter)
+    .height(baseBubbleDiameter)
     .shapeType("CIRCLE")
     .fillColor(color)
     .fillOpacity(BUBBLE_OPACITY)
@@ -239,10 +243,9 @@ export function createTrackerBar(
     )
     .build();
 
-  const barTextHeight = (baseBarHeight + 8) * sizeScale;
-  const barFontSize = (baseBarHeight + 2) * sizeScale;
-  // Vertical offset scales with bar height: -5.3 was tuned for 20px height, so use ratio
-  const barTextYOffset = (-5.3 / 20) * baseBarHeight * sizeScale;
+  const barTextHeight = baseBarHeight * (1 + BAR_TEXT_HEIGHT_OFFSET_RATIO) * sizeScale;
+  const barFontSize = baseBarHeight * (1 + BAR_FONT_SIZE_OFFSET_RATIO) * sizeScale;
+  const barTextYOffset = BAR_TEXT_Y_OFFSET_RATIO * baseBarHeight * sizeScale;
 
   const barText = buildText()
     .position({

@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import Input from "../components/Input";
 import {
   BASE_BAR_HEIGHT_METADATA_ID,
+  BASE_BUBBLE_DIAMETER_METADATA_ID,
   SEGMENTS_ENABLED_METADATA_ID,
   TRACKERS_ABOVE_METADATA_ID,
   VERTICAL_OFFSET_METADATA_ID,
@@ -42,6 +43,13 @@ export function Action(): React.JSX.Element {
   const baseBarHeight = useSceneSettingsStore((state) => state.baseBarHeight);
   const setBaseBarHeight = useSceneSettingsStore(
     (state) => state.setBaseBarHeight,
+  );
+
+  const baseBubbleDiameter = useSceneSettingsStore(
+    (state) => state.baseBubbleDiameter,
+  );
+  const setBaseBubbleDiameter = useSceneSettingsStore(
+    (state) => state.setBaseBubbleDiameter,
   );
 
   const segmentsEnabled = useSceneSettingsStore(
@@ -172,9 +180,9 @@ export function Action(): React.JSX.Element {
                   }}
                 ></ToggleButton>
 
-                {/* Bar Height */}
+                {/* Base Bar Height */}
                 <h2 className="justify-self-start text-sm text-text-primary dark:text-text-primary-dark">
-                  Bar Height
+                  Base Bar Height
                 </h2>
                 <Input
                   value={baseBarHeight}
@@ -182,6 +190,20 @@ export function Action(): React.JSX.Element {
                     setBaseBarHeight(value);
                     OBR.scene.setMetadata({
                       [getPluginId(BASE_BAR_HEIGHT_METADATA_ID)]: value,
+                    });
+                  }}
+                ></Input>
+
+                {/* Base Bubble Diameter */}
+                <h2 className="justify-self-start text-sm text-text-primary dark:text-text-primary-dark">
+                  Base Bubble Diameter
+                </h2>
+                <Input
+                  value={baseBubbleDiameter}
+                  updateHandler={(value: number) => {
+                    setBaseBubbleDiameter(value);
+                    OBR.scene.setMetadata({
+                      [getPluginId(BASE_BUBBLE_DIAMETER_METADATA_ID)]: value,
                     });
                   }}
                 ></Input>

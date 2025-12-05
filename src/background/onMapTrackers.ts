@@ -25,6 +25,7 @@ import {
 import { BubblePosition } from "./trackerPositionHelper";
 import {
   BASE_BAR_HEIGHT_METADATA_ID,
+  BASE_BUBBLE_DIAMETER_METADATA_ID,
   SEGMENTS_ENABLED_METADATA_ID,
   TRACKERS_ABOVE_METADATA_ID,
   VERTICAL_OFFSET_METADATA_ID,
@@ -32,7 +33,7 @@ import {
   readNumberFromMetadata,
 } from "../sceneMetadataHelpers";
 import { getImageCenter } from "./mathHelpers";
-import { DEFAULT_BAR_HEIGHT } from "../useSceneSettingsStore";
+import { DEFAULT_BAR_HEIGHT, DEFAULT_BUBBLE_DIAMETER } from "../useSceneSettingsStore";
 
 // Module state - allows changes to scene metadata to affect all tokens simultaneously
 let itemsLast: Image[] = []; // for item change checks
@@ -44,6 +45,7 @@ let userRoleLast: "GM" | "PLAYER";
 let verticalOffset = 0;
 let trackersAboveToken = false;
 let baseBarHeight = DEFAULT_BAR_HEIGHT;
+let baseBubbleDiameter = DEFAULT_BUBBLE_DIAMETER;
 let segmentsEnabled = true;
 let segmentSettings = new Map<string, number>();
 
@@ -79,11 +81,13 @@ async function getGlobalSettings(sceneMetadata?: Metadata): Promise<boolean> {
     newVerticalOffset,
     newTrackersAboveToken,
     newBaseBarHeight,
+    newBaseBubbleDiameter,
     newSegmentsEnabled,
   ] = [
     readNumberFromMetadata(sceneMetadata, VERTICAL_OFFSET_METADATA_ID),
     readBooleanFromMetadata(sceneMetadata, TRACKERS_ABOVE_METADATA_ID),
     readNumberFromMetadata(sceneMetadata, BASE_BAR_HEIGHT_METADATA_ID) || DEFAULT_BAR_HEIGHT,
+    readNumberFromMetadata(sceneMetadata, BASE_BUBBLE_DIAMETER_METADATA_ID) || DEFAULT_BUBBLE_DIAMETER,
     readBooleanFromMetadata(sceneMetadata, SEGMENTS_ENABLED_METADATA_ID),
   ];
 
@@ -91,11 +95,13 @@ async function getGlobalSettings(sceneMetadata?: Metadata): Promise<boolean> {
     newVerticalOffset !== verticalOffset ||
     newTrackersAboveToken !== trackersAboveToken ||
     newBaseBarHeight !== baseBarHeight ||
+    newBaseBubbleDiameter !== baseBubbleDiameter ||
     newSegmentsEnabled !== segmentsEnabled;
 
   verticalOffset = newVerticalOffset;
   trackersAboveToken = newTrackersAboveToken;
   baseBarHeight = newBaseBarHeight;
+  baseBubbleDiameter = newBaseBubbleDiameter;
   segmentsEnabled = newSegmentsEnabled;
 
   return doRefresh;
@@ -420,6 +426,7 @@ function updateItemTrackers(
       origin,
       bounds,
       cumulativeBarHeight,
+      baseBubbleDiameter,
       trackersAboveToken,
     );
 
@@ -437,6 +444,7 @@ function updateItemTrackers(
         "https://raw.githubusercontent.com/SeamusFinlayson/owl-trackers/main/src/assets/visibility_off.png",
         getImageId(item.id, hideLabelName),
         getImageBackgroundId(item.id, hideLabelName),
+        baseBubbleDiameter,
       );
       addItemsArray.push(...hideIndicator);
     }
@@ -464,6 +472,7 @@ function updateItemTrackers(
               y: position.y - verticalOffset,
             },
             index,
+            baseBubbleDiameter,
           ),
         );
       }

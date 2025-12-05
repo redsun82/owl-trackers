@@ -1,10 +1,9 @@
-import { BUBBLE_DIAMETER } from "./compoundItemHelpers";
-
 export class BubblePosition {
   origin: { x: number; y: number };
   bounds: { width: number; height: number };
   totalBarHeight: number;
   aboveToken: boolean;
+  baseBubbleDiameter: number;
   currentRowXOffset = 0;
   currentRowMaxHeight = 0;
   cumulativeYOffset = 0;
@@ -13,16 +12,18 @@ export class BubblePosition {
     origin: { x: number; y: number },
     bounds: { width: number; height: number },
     totalBarHeight: number,
+    baseBubbleDiameter: number,
     aboveToken: boolean = false,
   ) {
     this.origin = origin;
     this.bounds = bounds;
     this.totalBarHeight = totalBarHeight;
+    this.baseBubbleDiameter = baseBubbleDiameter;
     this.aboveToken = aboveToken;
   }
 
   getNew(sizeScale: number = 1): { x: number; y: number } {
-    const scaledDiameter = BUBBLE_DIAMETER * sizeScale;
+    const scaledDiameter = this.baseBubbleDiameter * sizeScale;
     const spacing = 2;
 
     if (this.currentRowXOffset + scaledDiameter + spacing > this.bounds.width) {
