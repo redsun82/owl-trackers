@@ -241,11 +241,13 @@ export function createTrackerBar(
 
   const barTextHeight = (baseBarHeight + 8) * sizeScale;
   const barFontSize = (baseBarHeight + 2) * sizeScale;
+  // Vertical offset scales with bar height: -5.3 was tuned for 20px height, so use ratio
+  const barTextYOffset = (-5.3 / 20) * baseBarHeight * sizeScale;
 
   const barText = buildText()
     .position({
       x: position.x,
-      y: position.y + TEXT_VERTICAL_OFFSET + -5.3 * sizeScale,
+      y: position.y + TEXT_VERTICAL_OFFSET + barTextYOffset,
     })
     .plainText(`${tracker.value}/${tracker.max}`)
     .textAlign("CENTER")
